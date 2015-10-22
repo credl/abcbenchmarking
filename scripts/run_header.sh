@@ -108,8 +108,7 @@ function run {
 		# ============================================================
 
 		# run single instance
-		confstr="--solver=genuinegc;--solver=genuineii"
-		$bmscripts/runconfigs.sh $static "$instance" "$to" $customoutputbuilder
+		$bmscripts/runconfigs.sh $static "$confstr" "$instance" "$to" "$customoutputbuilder"
 	fi
 
 }
