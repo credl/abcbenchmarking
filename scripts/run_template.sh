@@ -144,9 +144,9 @@ function run {
 
 loop="instances/*.hex"                                         # (1)
 confstr="--solver=genuinegc;--solver=genuineii"                # (2)
-static="dlvhex2 --plugindir=../../src INST CONF" "$confstr"    # (3)
+static="dlvhex2 --plugindir=../../src INST CONF"               # (3)
 bmname=""
 customaggregationscript=""
 customoutputbuilder=""
 
-run $loop $confstr $static $bmname $customaggregationscript $customoutputbuilder
+run "$loop" "$confstr" "$static" "$bmname" "$customaggregationscript" "$customoutputbuilder"
