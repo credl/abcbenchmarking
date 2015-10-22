@@ -99,37 +99,54 @@ fi
 mydir="$(dirname $0)"
 mydir=$(cd $mydir; pwd)
 
+function run {
+
+	loop=$1
+	confstr=$2
+	static=$3
+	bmname=$4
+	customaggregationscript=$5
+	customoutputbuilder=$6
+
+	if [[ $all -eq 1 ]]; then
+		# ============================================================
+		# Replace "instances/*.hex" in (1) by the loop condition
+		# to be used for iterating over the instances
+		# ============================================================
+
+		# run all instances using the benchmark script runinsts.sh
+		$bmscripts/runinsts.sh $loop "$mydir/run.sh" "$mydir" "$to" "$customaggregationscript" "$bmname"
+	else
+		# ============================================================
+		# Define the variable "confstr" in (2) as a semicolon-
+		# separated list of configurations to compare.
+		# In (3) replace "dlvhex2 --plugindir=../../src INST CONF"
+		# by an appropriate call of dlvhex, where INST will be
+		# substituted by the instance file and CONF by the current
+		# configuration from variable "confstr".
+		# ============================================================
+
+		# run single instance
+		confstr="--solver=genuinegc;--solver=genuineii"
+		$bmscripts/runconfigs.sh $static "$instance" "$to" $customoutputbuilder
+	fi
+
+}
+
 #
 # (*)
 # 
 # HERE THE BENCHMARK-SPECIFIC PART STARTS
-if [[ $all -eq 1 ]]; then
-	# ============================================================
-	# Replace "instances/*.hex" in (1) by the loop condition
-	# to be used for iterating over the instances
-	# ============================================================
+# 
+# - Replace "instances/*.hex" in (1) by the loop condition to be used for iterating over the instances
+# - Define the variable "confstr" in (2) as a semicolon-separated list of configurations to compare.
+# - In (3) replace "dlvhex2 --plugindir=../../src INST CONF" by an appropriate call of the reasoner, where INST will be substituted by the instance file and CONF by the current configuration from variable "confstr".
 
-	# run all instances using the benchmark script runinsts.sh
-	$bmscripts/runinsts.sh "instances/*.hex" "$mydir/run.sh" "$mydir" "$to"                             # (1)
+loop="instances/*.hex"                                         # (1)
+confstr="--solver=genuinegc;--solver=genuineii"                # (2)
+static="dlvhex2 --plugindir=../../src INST CONF" "$confstr"    # (3)
+bmname=""
+customaggregationscript=""
+customoutputbuilder=""
 
-	# In order to use a custom aggregation script "myagg.sh" (in the same directory as run.sh)
-	# and/or a custom benchmark name "bmname", use:
-	# $bmscripts/runinsts.sh "instances/*.hex" "$mydir/run.sh" "$mydir" "$to" "$mydir/agg.sh" "bmname"  # (1 [alternative])
-else
-	# ============================================================
-	# Define the variable "confstr" in (2) as a semicolon-
-	# separated list of configurations to compare.
-	# In (3) replace "dlvhex2 --plugindir=../../src INST CONF"
-	# by an appropriate call of dlvhex, where INST will be
-	# substituted by the instance file and CONF by the current
-	# configuration from variable "confstr".
-	# ============================================================
-
-	# run single instance
-	confstr="--solver=genuinegc;--solver=genuineii"                                                                    # (2)
-	$bmscripts/runconfigs.sh "dlvhex2 --plugindir=../../src INST CONF" "$confstr" "$instance" "$to"                    # (3)
-
-	# In order to use a custom output builder "myob.sh" (in the same directory as run.sh), use:
-	# $bmscripts/runconfigs.sh "dlvhex2 --plugindir=../../src INST CONF" "$confstr" "$instance" "$to" "$mydir/myob.sh" # (3 [alternative])
-fi
-
+run $loop $confstr $static
