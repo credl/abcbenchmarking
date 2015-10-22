@@ -96,7 +96,8 @@ function run {
 		# ============================================================
 
 		# run all instances using the benchmark script runinsts.sh
-		$bmscripts/runinsts.sh "$loop" "$mydir/run.sh" "$mydir" "$to" "$customaggregationscript" "$bmname"
+		me=`basename "$0"`
+		$bmscripts/runinsts.sh "$loop" "$mydir/$me" "$mydir" "$to" "$customaggregationscript" "$bmname"
 	else
 		# ============================================================
 		# Define the variable "confstr" in (2) as a semicolon-
