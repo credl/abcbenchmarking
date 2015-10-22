@@ -149,4 +149,4 @@ bmname=""
 customaggregationscript=""
 customoutputbuilder=""
 
-run $loop $confstr $static
+run $loop $confstr $static $bmname $customaggregationscript $customoutputbuilder
