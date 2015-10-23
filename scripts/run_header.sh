@@ -90,26 +90,13 @@ function run {
 	customoutputbuilder=$6
 
 	if [[ $all -eq 1 ]]; then
-		# ============================================================
-		# Replace "instances/*.hex" in (1) by the loop condition
-		# to be used for iterating over the instances
-		# ============================================================
-
 		# run all instances using the benchmark script runinsts.sh
 		me=`basename "$0"`
 		$bmscripts/runinsts.sh "$loop" "$mydir/$me" "$mydir" "$to" "$customaggregationscript" "$bmname"
 	else
-		# ============================================================
-		# Define the variable "confstr" in (2) as a semicolon-
-		# separated list of configurations to compare.
-		# In (3) replace "dlvhex2 --plugindir=../../src INST CONF"
-		# by an appropriate call of dlvhex, where INST will be
-		# substituted by the instance file and CONF by the current
-		# configuration from variable "confstr".
-		# ============================================================
-
 		# run single instance
 		$bmscripts/runconfigs.sh "$static" "$confstr" "$instance" "$to" "$customoutputbuilder"
 	fi
 
 }
+
