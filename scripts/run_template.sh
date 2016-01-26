@@ -1,15 +1,14 @@
 #!/bin/bash
 
 # This file serves as a template for run scripts for new benchmarks.
-# Most of the script may be left unchanged. The parts which depend
+# Most parts of the script may be left unchanged. The parts which depend
 # on the current benchmark are marked.
 #
-# If your PATH variable contains the path to a clone of
-# https://github.com/hexhex/benchmarks/scripts,
-# then the benchmarks can be started by calling
+# If your PATH variable contains the path to the "scripts" directory of
+# the ABC benchmarking system, then the benchmarks can be started by calling
 #	./run.sh
 # Otherwise, you may explicitly specify the path by calling
-#	./run.sh all 300 PATH_TO_BENCHMARK_SCRIPTS
+#	./run.sh all 300 PATH_TO_ABCBENCHMARKING_SCRIPTS
 #
 # In many cases, run scripts will be exactly like this template until the
 # very last if block (*). Thus they may simply include this part,
@@ -109,23 +108,9 @@ function run {
 	customoutputbuilder=$6
 
 	if [[ $all -eq 1 ]]; then
-		# ============================================================
-		# Replace "instances/*.hex" in (1) by the loop condition
-		# to be used for iterating over the instances
-		# ============================================================
-
 		# run all instances using the benchmark script runinsts.sh
 		$bmscripts/runinsts.sh $loop "$mydir/run.sh" "$mydir" "$to" "$customaggregationscript" "$bmname"
 	else
-		# ============================================================
-		# Define the variable "confstr" in (2) as a semicolon-
-		# separated list of configurations to compare.
-		# In (3) replace "dlvhex2 --plugindir=../../src INST CONF"
-		# by an appropriate call of dlvhex, where INST will be
-		# substituted by the instance file and CONF by the current
-		# configuration from variable "confstr".
-		# ============================================================
-
 		# run single instance
 		confstr="--solver=genuinegc;--solver=genuineii"
 		$bmscripts/runconfigs.sh $static "$instance" "$to" $customoutputbuilder
@@ -138,15 +123,21 @@ function run {
 # 
 # HERE THE BENCHMARK-SPECIFIC PART STARTS
 # 
+# Mandatory:
 # - Replace "instances/*.hex" in (1) by the loop condition to be used for iterating over the instances
 # - Define the variable "confstr" in (2) as a semicolon-separated list of configurations to compare.
 # - In (3) replace "dlvhex2 --plugindir=../../src INST CONF" by an appropriate call of the reasoner, where INST will be substituted by the instance file and CONF by the current configuration from variable "confstr".
+# 
+# Optional:
+# - Specify a custom benchmark name (4)
+# - Specify a custom aggregation script (5)
+# - Specify a custom output builder (6)
 
 loop="instances/*.hex"                                         # (1)
 confstr="--solver=genuinegc;--solver=genuineii"                # (2)
 static="dlvhex2 --plugindir=../../src INST CONF"               # (3)
-bmname=""
-customaggregationscript=""
-customoutputbuilder=""
+bmname=""                                                      # (4)
+customaggregationscript=""                                     # (5)
+customoutputbuilder=""                                         # (6)
 
 run "$loop" "$confstr" "$static" "$bmname" "$customaggregationscript" "$customoutputbuilder"

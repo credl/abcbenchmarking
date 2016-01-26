@@ -83,7 +83,7 @@ positioning,fit,calc,decorations.text,shadows%
 
 \begin{document}
 	
-	\title{The \abcs{} Benchmark System}
+	\title{The \abcs{} Benchmarking System}
 	\author{Christoph Redl}
 
 %	\maketitle
@@ -96,7 +96,7 @@ positioning,fit,calc,decorations.text,shadows%
         {\bfseries\Huge The \abcs{} Benchmarking System} \\[1em]
         {\bfseries\Huge User Manual} \\
         \vskip3.0cm
-%        {\sc\Large INFSYS Research Report 1843-15-07} \\
+        {\sc\Large INFSYS Research Report 1843-16-01} \\
         \medskip
         {\Large \today}        
         \vskip2cm
@@ -119,7 +119,7 @@ positioning,fit,calc,decorations.text,shadows%
 	\label{sec:introduction}
 
 		This paper describes the \abcs{} benchmarking system
-		for \uline{a}utomated \uline{b}enchmark runs on top of HT\uline{C}ondor, i.e.,
+		for \uline{a}utomated \uline{b}enchmarking on top of HT\uline{C}ondor, i.e.,
 		comparing systems or system configurations to each other.
 		The system is intended to be easy to use yet customizable to a large variety of
 		benchmark problems.
@@ -129,7 +129,7 @@ positioning,fit,calc,decorations.text,shadows%
 		which essentially specifies problem-specific parameters and then delegates the call
 		to generic scripts provided by this system.
 		
-		The \abcs-system
+		The \abcs{} system
 		is intended to run benchmark instances with multiple system configurations
 		and extract benchmark parameters (such as grounding and solving time, number of answer sets) for each.
 		It supports automated scheduling of instances, parameter extraction,
@@ -145,136 +145,150 @@ positioning,fit,calc,decorations.text,shadows%
 		The system is implemented as a set of shell scripts which should work on most Linux shells; at least the \emph{bash} shell.
 		The basic functions of the system do not have any further requirements, only features such as scheduling on top of HTCondor
 		or aggregation of the results (see below) depend on third-party software.
-		All scripts of the \abcs-system are collected in the directory {\tt scripts},
+		All scripts of the \abcs{} system are collected in the directory {\tt scripts},
 		to which we refer in the following whenever we discuss shell scripts.
 		It is suggested to add the {\tt scripts} directory to the search path for executables.
 		\footnote{While the \abcs{} system is generic and most scripts are useful for benchmarks with any software system,
 		few are specific for the \dlvhex{} reasoner, which are easily recognizable by the prefix {\tt dlvhex\_} in their filenames.}
 
-		In order to use the system for a concrete benchmark problem,
-		the file {\tt run\_template.sh}
-		has to be copied to {\tt run.sh} within the benchmark problem's directory.
-		The file needs then to be adopted to the problem by modifying the lines
-		marked with (1), (2) and (3) as follows.
-		\begin{enumerate}
-		\item[(1)] The loop condition which iterates over the instances of the benchmark needs to be configured.
-			Usually this condition will iterate over files, but sometimes also an iteration in a certain range can be useful.
+		\subsection{Specifying a Benchmark}
+		\label{sec:usage:specifying}
 
-			\begin{tabbing}
-				\textbf{Example: } \= {\tt "instances/*.hex"} \\
-				\> iterates over all {\tt .hex} files in directory {\tt instances}.
-			\end{tabbing}
+			In order to use the system for a concrete benchmark problem,
+			the file {\tt run\_template.sh}
+			has to be copied to {\tt run.sh} within the benchmark problem's directory.
+			The file needs then to be adopted to the problem by modifying the lines
+			marked with (1), (2) and (3) as follows.
+			\begin{enumerate}
+			\item[(1)] The loop condition which iterates over the instances of the benchmark needs to be configured.
+				Usually this condition will iterate over files, but sometimes also an iteration in a certain range can be useful.
 
-			\begin{tabbing}
-				\textbf{Example: } \= {\tt "\{1..20\}"} \\
-				\> iterates over the integers from $1$ to $20$.
-			\end{tabbing}
-		\item[(2)] Here, the commands (e.g.~calls of a reasoner or another software systems) to be compared should be entered in a semicolon-separated list.
+				\begin{tabbing}
+					\textbf{Example: } \= {\tt "instances/*.hex"} \\
+					\> iterates over all {\tt .hex} files in directory {\tt instances}.
+				\end{tabbing}
 
-			When comparing entirely different systems,
-			the configurations specified at (2) should contain the command strings \emph{including} the executable name and all options.
+				\begin{tabbing}
+					\textbf{Example: } \= {\tt "\{1..20\}"} \\
+					\> iterates over the integers from $1$ to $20$.
+				\end{tabbing}
+			\item[(2)] Here, the commands (e.g.~calls of a reasoner or another software systems) to be compared should be entered in a semicolon-separated list.
 
-			\begin{tabbing}
-				\textbf{Example: } \= {\tt "dlv;clasp;dlv -n=1;clasp -n=1"} \\
-				\> compares {\sc DLV} and {\sc clasp} runs for computing \\
-				\> all and the first ({\tt -n=1}) answer set, respectively.
-			\end{tabbing}
+				When comparing entirely different systems,
+				the configurations specified at (2) should contain the command strings \emph{including} the executable name and all options.
 
-			If all configurations compare the same system (e.g.~\dlvhex{}) but with different options,
-			then as a shortcut the static part can (but does not need to) be part of the string at
-			(3) (see below), while (2) may contain only the changing parts of the command.
+				\begin{tabbing}
+					\textbf{Example: } \= {\tt "dlv;clasp;dlv -n=1;clasp -n=1"} \\
+					\> compares {\sc DLV} and {\sc clasp} runs for computing \\
+					\> all and the first ({\tt -n=1}) answer set, respectively.
+				\end{tabbing}
 
-			\begin{tabbing}
-				\textbf{Example: } \= {\tt "flpcheck=explicit;--flpcheck=ufs"} \\
-				\> compares two \dlvhex{} configurations, where the actual \\
-				\> reasoner call is specified at (3) (see below).
-			\end{tabbing}
+				If all configurations compare the same system (e.g.~\dlvhex{}) but with different options,
+				then as a shortcut the static part can (but does not need to) be part of the string at
+				(3) (see below), while (2) may contain only the changing parts of the command.
 
-		\item[(3)] Here, the static part of the actual shell command for a reasoner call needs to be inserted (i.e.,~without configuration-specific options).
+				\begin{tabbing}
+					\textbf{Example: } \= {\tt "flpcheck=explicit;--flpcheck=ufs"} \\
+					\> compares two \dlvhex{} configurations, where the actual \\
+					\> reasoner call is specified at (3) (see below).
+				\end{tabbing}
 
-			The tokens {\tt INST} and {\tt CONF}\footnote{
-			Alternatively to {\tt INST} and {\tt CONF}, the meta-variables {\tt \textbackslash\$instance} and {\tt \textbackslash\$config}
-			within the command string can be used (e.g.~{\tt dlvhex2 -n=1 \textbackslash\$config \textbackslash\$instance});
-			note the backslash in front of the {\$} characters which makes sure that the variables are not immediately resolved but
-			are part of the string and are to be resolved later when an individual instance and configuration is to be inserted.}
-			will be substituted by the instance name and the current configuration, respectively.
+			\item[(3)] Here, the static part of the actual shell command for a reasoner call needs to be inserted (i.e.,~without configuration-specific options).
 
-			If the string at (2) contains full commands, then
-			the string at (3) should be {\tt "CONF INST"}. Since {\tt CONF} in (3)
-			will be substituted by the elements from the configuration string before executing the command, this will
-			produce complete reasoner calls.
+				The tokens {\tt INST} and {\tt CONF}\footnote{
+				Alternatively to {\tt INST} and {\tt CONF}, the meta-variables {\tt \textbackslash\$instance} and {\tt \textbackslash\$config}
+				within the command string can be used (e.g.~{\tt dlvhex2 -n=1 \textbackslash\$config \textbackslash\$instance});
+				note the backslash in front of the {\$} characters which makes sure that the variables are not immediately resolved but
+				are part of the string and are to be resolved later when an individual instance and configuration is to be inserted.}
+				will be substituted by the instance name and the current configuration, respectively.
 
-			\begin{tabbing}
-				\textbf{Example: } \= Let {\tt "dlv;clasp;dlv -n=1;clasp -n=1"} be the \\
-				\> configuration string at (2). \\
-				\> Then the string {\tt "CONF INST"} at (3) will evaluate: \\
-				\> \ \ \ {\tt dlv INST} \\
-				\> \ \ \ {\tt clasp INST} \\
-				\> \ \ \ {\tt dlv -n=1 INST} \\
-				\> \ \ \ {\tt clasp -n=1 INST} \\
-				\> for all instances {\tt INST}.
-			\end{tabbing}
+				If the string at (2) contains full commands, then
+				the string at (3) should be {\tt "CONF INST"}. Since {\tt CONF} in (3)
+				will be substituted by the elements from the configuration string before executing the command, this will
+				produce complete reasoner calls.
 
-			If the string at (2) contains only the changing part of the command,
-			then the static part must contained in the string at (3).
+				\begin{tabbing}
+					\textbf{Example: } \= Let {\tt "dlv;clasp;dlv -n=1;clasp -n=1"} be the \\
+					\> configuration string at (2). \\
+					\> Then the string {\tt "CONF INST"} at (3) will evaluate: \\
+					\> \ \ \ {\tt dlv INST} \\
+					\> \ \ \ {\tt clasp INST} \\
+					\> \ \ \ {\tt dlv -n=1 INST} \\
+					\> \ \ \ {\tt clasp -n=1 INST} \\
+					\> for all instances {\tt INST}.
+				\end{tabbing}
 
-			\begin{tabbing}
-				\textbf{Example: } \= Let {\tt "flpcheck=explicit;--flpcheck=ufs"} be the \\
-				\> configuration string at (2). \\
-				\> Then the string {\tt "dlvhex2 -n=1 CONF INST"} at (3) will evaluate: \\
-				\> \ \ \ {\tt dlvhex2 -n=1 --flpcheck=explitit INST} \\
-				\> \ \ \ {\tt dlvhex2 -n=1 --flpcheck=ufs INST} \\
-				\> for all instances {\tt INST}.
-			\end{tabbing}
-		\end{enumerate}
+				If the string at (2) contains only the changing part of the command,
+				then the static part must contained in the string at (3).
+
+				\begin{tabbing}
+					\textbf{Example: } \= Let {\tt "flpcheck=explicit;--flpcheck=ufs"} be the \\
+					\> configuration string at (2). \\
+					\> Then the string {\tt "dlvhex2 -n=1 CONF INST"} at (3) will evaluate: \\
+					\> \ \ \ {\tt dlvhex2 -n=1 --flpcheck=explitit INST} \\
+					\> \ \ \ {\tt dlvhex2 -n=1 --flpcheck=ufs INST} \\
+					\> for all instances {\tt INST}.
+				\end{tabbing}
+			\end{enumerate}
+
+			Additionally the these mandatory customizations, a custom benchmark name might be specified at (4);
+			by default it is extracted from the directory name.
+			Moreover, the aggregation of the results (5) and
+			the extraction of benchmark parameters from the runs needs (6) can also be customized.
+			Section~\ref{sec:architecture} is a good starting point to learn more about these parameters.
 		
-		Note that the scripts {\tt runinsts.sh} and {\tt runconfigs.sh} support more
-		parameters than shown in {\tt run\_template.sh}.
-		However, the default values are good for most benchmarks.
-		If the aggregation of the results or
-		the extraction of benchmark parameters from the runs needs to be customized,
-		then Section~\ref{sec:architecture} is a good starting point to learn about the parameters.
-		
-		As stated above, it is convenient to add the path to the {\tt scripts} directory to the {\tt PATH} variable.
-		In this case, scheduling the benchmark instances is possible by simply calling {\tt ./run.sh},
-		otherwise the path to this directory needs to be passed as parameter to {\tt run.sh}
-		(cf.~Section~\ref{sec:architecture:run}).
+			As stated above, it is convenient to add the path to the {\tt scripts} directory to the {\tt PATH} variable.
+			In this case, scheduling the benchmark instances is possible by simply calling {\tt ./run.sh},
+			otherwise the path to this directory needs to be passed as parameter to {\tt run.sh}
+			(cf.~Section~\ref{sec:architecture:run}).
 
-		Moreover, the beginnings of {\tt run.sh} scripts are in many cases exactly
-		like in {\tt run\_template.sh}. Thus this part can be directly imported by
-		\begin{center}
-			{\tt source run\_header.sh}
-		\end{center}
-		provided that the benchmark script directory is the {\tt PATH} variable.
-		This also defines the aliases
-		{\tt all=$0$}, {\tt instance=\$2}, {\tt to=\$3}, {\tt bmscripts=\$4}
-		if {\tt \$1} is {\tt single}, and
-		{\tt all=1}, {\tt to=\$2}, {\tt bmscripts=\$3} otherwise (cf.~Section~\ref{sec:architecture:run}).
-		Moreover, {\tt mydir} will be set to the absolute path of the directory where
-		the current {\tt run.sh} script is located and {\tt req} to the requirements file to be used.
-			
+		\subsection{Shortcut}
+		\label{sec:usage:simplifying}
+
+			The beginnings of {\tt run.sh} scripts are in many cases exactly
+			like in {\tt run\_template.sh}. Provided that the benchmark script directory is the {\tt PATH} variable,
+			the static part can be directly imported by
+			\begin{center}
+				{\tt source run\_header.sh}
+			\end{center}
+			while only the definitions of (1), (2) and (3) (and optionally (4), (5) and (6)) at the bottom need to be specified;
+			for details we refer to the comments in {\tt run\_template.sh}.
+
+			Note that the import of {\tt source run\_header.sh} also defines the aliases
+			{\tt all=$0$}, {\tt instance=\$2}, {\tt to=\$3}, {\tt bmscripts=\$4}
+			if {\tt \$1} is {\tt single}, and
+			{\tt all=1}, {\tt to=\$2}, {\tt bmscripts=\$3} otherwise (cf.~Section~\ref{sec:architecture:run}).
+			Moreover, {\tt mydir} will be set to the absolute path of the directory where
+			the current {\tt run.sh} script is located and {\tt req} to the requirements file to be used.
+			These variables might be used in the benchmark-specific definitions.
+
 	\section{System Architecture and Customization}
 	\label{sec:architecture}
 
 		The basic system architecture is visualized in Figure~\ref{fig:architecture}.
 		There is a single benchmark-specific file {\tt run.sh}, which is usually stored
-		in the benchmark's directory (different from the {\tt scripts} directory of the \abcs-system).
+		in the benchmark's directory (different from the {\tt scripts} directory of the \abcs{} system).
 		This file can be used for scheduling all instances and for evaluating a single instance
 		(controlled by parameters). Normally, the user calls this file without any parameters,
 		which schedules all instances (due to the default values for the parameters).
 		Internally, {\tt run.sh} uses scripts from the benchmark scripts directory
-		({\tt runinsts.sh} and {\tt runconfigs.sh}; those are not benchmark-specific) to schedule all instances for all configurations
-		which are to be compared. Those scripts will make callbacks to {\tt run.sh} for evaluating single instances
+		({\tt runinsts.sh} and {\tt runconfigs.sh}; these are not benchmark-specific) to schedule all instances for all configurations
+		which are to be compared.
+		In basic settings, these scripts do \emph{not need to be used manually} as {\tt run\_template.sh} abstracts from them
+		(if {\tt run\_header.sh} is used, the calls are not even visible in {\tt run.sh}).
+		However, we still describe the details here as advanced benchmarks might need to customize the calls.
+
+		The script {\tt runinsts.sh} makes callbacks to {\tt run.sh} for evaluating single instances
 		(appropriate parameters make this script run a single instance rather than all instances in the initial call).
 		Note that the two {\tt run.sh} occurrences in Figure~\ref{fig:architecture} refer
 		to a single physical file (symbolized by their connection).
 		
-		For each finished instance, the script system will call an \emph{output builder}
+		For each finished instance, the script system will call an \emph{output builder} (can be customized at (6) in {\tt run\_template.sh})
 		which extracts the actual benchmark parameters the user is interested in,
 		e.g.~time information and number of answer sets,
 		from the reasoner output (standard output and standard error).
 		The result is stored in a separate result file for each instance.
-		When all instances have finished, the script system further calls an \emph{aggregation script},
+		When all instances have finished, the script system further calls an \emph{aggregation script} (can be customized at (5) in {\tt run\_template.sh}),
 		which generates the final benchmark table from the results of individual instances.
 		The script system provides a standard output builder {\tt outputbuilder.sh} and a standard aggregation script {\tt aggregateresults.sh},
 		which are good for many benchmark problems, but customization is possible by providing alternative scripts
@@ -500,9 +514,12 @@ positioning,fit,calc,decorations.text,shadows%
 			    \item {\tt timeoutbuilder.sh} extracts the overall time (one time column and a column $0/1$ for tagging successful/timeout instances).
 			    \item {\tt gstimeoutbuilder.sh} extracts the overall time, the grounding and the solving time (each accompanied by a column $0/1$ for tagging successful/timeout instances).
 			    \item {\tt ansctimeoutputbuilder.sh} extracts the overall time (accompanied by a column $0/1$ for tagging successful/timeout instances) and the number of answer sets.
+                            \item {\tt anscgstimeoutputbuilder.sh} extracts the overall time (accompanied by a column $0/1$ for tagging successful/timeout instances), the grounding and solving time and the number of answer sets.
                             \item {\tt debugoutbuilder.sh} is the same as {\tt timeoutputbuilder.sh} but includes also stdout and stderr of the command in the stderr of the benchmark results.
 			\end{itemize}
-	
+
+			A custom output builder can be specified at (6) in {\tt run\_template.sh} (which is internally passed to {\tt runconfigs.sh}, cf.~Section~\ref{sec:architecture:runconfigs}).
+
 		\subsection{Aggregation Scripts}
 		\label{sec:architecture:aggregate}
 
@@ -535,9 +552,9 @@ positioning,fit,calc,decorations.text,shadows%
 	
 			The default for {\tt \$4-\$7}
 			is to compute means of odd and sums of even columns (interpreted as times and timeouts, respectively).
-	
-			If a customized aggregation script is specified in the call of {\tt runinsts.sh} (cf.~Section~\ref{sec:architecture:runinsts}),
-			then this script can delegate the call to the default script {\tt aggregateresults.sh} with appropriate parameters.
+			A customized aggregation script can delegate the call to the default script {\tt aggregateresults.sh} with appropriate parameters.
+
+			A custom aggregation script can be specified at (5) in {\tt run\_template.sh} (which is internally passed to {\tt runinsts.sh}, cf.~Section~\ref{sec:architecture:runinsts}).
 	
 		\subsection{Requirements File}
 		\label{sec:architecture:reqfile}
