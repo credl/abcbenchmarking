@@ -39,8 +39,8 @@ else
 fi
 
 # check if there is a grounding and solving time (should be the case for successful instances)
-groundertime=$(cat $insterr | grep -a "HEX grounder time:" | tail -n 1)
-solvertime=$(cat $insterr | grep -a "HEX solver time:" | tail -n 1)
+groundertime=$(cat $insterr | grep -a "HEX grounder time:" | head -n 1 | tail -n 1)
+solvertime=$(cat $insterr | grep -a "HEX solver time:" | head -n 1 | tail -n 1)
 if [[ $groundertime != "" ]]; then
 	haveGroundertime=1
 fi
