@@ -62,7 +62,7 @@ else
 	solvertime="$(printf "%.2f" $solvertime) 0"
 fi
 
-echo -ne "$time $groundertime $solvertime $(cat $stdoutfile | wc -l)"
+echo -ne "$time $groundertime $solvertime $(cat $instout | wc -l)"
 exit 0
 
 exit $ret
