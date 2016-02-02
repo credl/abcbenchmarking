@@ -92,7 +92,7 @@ function run {
 	if [[ $all -eq 1 ]]; then
 		# run all instances using the benchmark script runinsts.sh
 		me=`basename "$0"`
-		$bmscripts/runinsts.sh "$loop" "$mydir/$me" "$mydir" "$to" "$customaggregationscript" "$bmname"
+		$bmscripts/runinsts.sh "$loop" "$mydir/$me" "$mydir" "$to" "$customaggregationscript" "$bmname" "$req"
 	else
 		# run single instance
 		$bmscripts/runconfigs.sh "$static" "$confstr" "$instance" "$to" "$customoutputbuilder"
