@@ -1,7 +1,7 @@
 #!/bin/bash
 
 error=0
-if [ $# -ge 1 ] && [[ $1 != "" ]]; then
+if [ $# -ge 1 ] && [[ "$1" != "" ]]; then
 	to=$1
 else
 	to="300.0"
@@ -165,7 +165,7 @@ do
 				extrstart=$start
 				extrlen=$len
 			else
-				if [[ $# -le 2 ]]; then
+				if [[ $specsize -eq 0 ]]; then
 					if [[ $start -ne $extrstart ]]; then
 						echo "Could not extract instance size due to inconsistent naming; please specify start and length of size within the filename manually"
 						exit 1
