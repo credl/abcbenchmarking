@@ -112,8 +112,7 @@ function run {
 		$bmscripts/runinsts.sh $loop "$mydir/run.sh" "$mydir" "$to" "$customaggregationscript" "$bmname"
 	else
 		# run single instance
-		confstr="--solver=genuinegc;--solver=genuineii"
-		$bmscripts/runconfigs.sh $static "$instance" "$to" $customoutputbuilder
+		$bmscripts/runconfigs.sh $static "$configstr" "$instance" "$to" $customoutputbuilder
 	fi
 
 }
@@ -133,7 +132,7 @@ function run {
 # - Specify a custom aggregation script (5)
 # - Specify a custom output builder (6)
 
-loop="instances/*.hex"                                         # (1)
+loop="instances/\*.hex"                                        # (1)
 confstr="--solver=genuinegc;--solver=genuineii"                # (2)
 static="dlvhex2 --plugindir=../../src INST CONF"               # (3)
 bmname=""                                                      # (4)
