@@ -112,7 +112,7 @@ function run {
 		$bmscripts/runinsts.sh "$loop" "$mydir/run.sh" "$mydir" "$to" "$customaggregationscript" "$bmname"
 	else
 		# run single instance
-		$bmscripts/runconfigs.sh "$static" "$configstr" "$instance" "$to" "$customoutputbuilder"
+		$bmscripts/runconfigs.sh "$static" "$confstr" "$instance" "$to" "$customoutputbuilder"
 	fi
 
 }
