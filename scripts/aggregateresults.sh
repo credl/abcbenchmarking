@@ -180,7 +180,7 @@ do
 		else
 			array[0]="${array[0]}"
 		fi
-	        line=$(echo ${array[@]} | grep -v "#")
+	        line=$(echo "${array[@]}" | grep -v "#")
 		file=$(echo "$file\n$line")
 	fi
 done < $data
