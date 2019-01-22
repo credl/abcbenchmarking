@@ -8,3 +8,5 @@ aggregating the parameters, generating a table in text or Latex format,
 and comparison of the results with previous runs.
 For scheduling benchmark instances, the system supports sequential runs using shell scripts only,
 or the HTCondor system (http://research.cs.wisc.edu/htcondor).
+
+For details see abcmanual/abcmanual.pdf.
